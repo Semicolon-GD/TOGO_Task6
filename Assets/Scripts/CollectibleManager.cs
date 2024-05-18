@@ -6,6 +6,7 @@ public class CollectibleManager : MonoBehaviour
 {
     [SerializeField] private GameObject stackParent;
     [SerializeField] private GameObject stackPoint;
+    [SerializeField] private GameObject player;
     
     
     
@@ -14,12 +15,15 @@ public class CollectibleManager : MonoBehaviour
    {
      EventManager.Subscribe(EventList.OnCollectiblePickup, StackCollectible);
      EventManager.Subscribe(EventList.OnObstacleHit, RemoveStack);
+     EventManager.Subscribe(EventList.GameFinished, CalculateScore);
    }
+   
 
    private void OnDisable()
    {
      EventManager.Unsubscribe(EventList.OnCollectiblePickup, StackCollectible);
      EventManager.Unsubscribe(EventList.OnObstacleHit, RemoveStack);
+     EventManager.Unsubscribe(EventList.GameFinished, CalculateScore);
    }
 
    private void StackCollectible(GameObject collectible)
@@ -33,32 +37,47 @@ public class CollectibleManager : MonoBehaviour
        collectible.transform.localPosition = stackPoint.transform.localPosition;
        stackPoint.transform.localPosition += Vector3.forward * 2;
 
-       if (_stackList.Count==1)
+       switch (_stackList.Count)
        {
-           _stackList[0].GetComponent<CollectibleBehaviour>().SetLeadTransform(transform);
-       }
-       else if (_stackList.Count>1)
-       {
-           _stackList[^1].GetComponent<CollectibleBehaviour>().SetLeadTransform(_stackList[^2].transform);
+           case 1:
+               _stackList[0].GetComponent<CollectibleBehaviour>().SetLeadTransform(player.transform);
+               break;
+           case > 1:
+               _stackList[^1].GetComponent<CollectibleBehaviour>().SetLeadTransform(_stackList[^2].transform);
+               break;
        }
    }
    
-   private void RemoveStack(GameObject collectible)
+   private void RemoveStack()
    {
        switch (_stackList.Count)
        {
            case >= 1:
            {
                var lostCollectible = _stackList[^1];
-               lostCollectible.transform.parent = null;
                _stackList.Remove(lostCollectible);
-               lostCollectible.gameObject.SetActive(false);
+               Destroy(lostCollectible);
                break;
            }
            case 0:
-               EventManager.Trigger(EventList.GameFailed);
+              EventManager.Trigger(EventList.GameFailed);
                break;
        }
        stackPoint.transform.localPosition -= Vector3.forward * 2;
    }
+   
+   private void CalculateScore()
+   {
+       float score = _stackList.Count;
+       if (score>0)
+       {
+           EventManager.Trigger(EventList.GameWon, score);
+       }
+       else
+       {
+              EventManager.Trigger(EventList.GameFailed);
+       }
+         
+   }
+  
 }

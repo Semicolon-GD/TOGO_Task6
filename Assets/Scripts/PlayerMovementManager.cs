@@ -6,6 +6,7 @@ public class PlayerMovementManager : MonoBehaviour
 {
     [SerializeField] private float playerSpeed;
     [SerializeField] private float dragSensitive;
+    [SerializeField] private Animator playerAnimator;
 
 
     private float _forwardSpeed;
@@ -15,6 +16,8 @@ public class PlayerMovementManager : MonoBehaviour
         EventManager.Subscribe(EventList.GameStarted, StartMovement);
         EventManager.Subscribe(EventList.OnHorizontalDrag, MovePlayer);
         EventManager.Subscribe(EventList.GameFinished, () => _forwardSpeed = 0);
+        EventManager.Subscribe(EventList.GameFailed, GameFailed);
+        EventManager.Subscribe(EventList.GameWon,GameWon);
     }
 
     private void OnDisable()
@@ -22,6 +25,8 @@ public class PlayerMovementManager : MonoBehaviour
         EventManager.Unsubscribe(EventList.GameStarted, StartMovement);
         EventManager.Unsubscribe(EventList.OnHorizontalDrag, MovePlayer);
         EventManager.Unsubscribe(EventList.GameFinished, () => _forwardSpeed = 0);
+        EventManager.Unsubscribe(EventList.GameFailed, GameFailed);
+        EventManager.Unsubscribe(EventList.GameWon,GameWon);
     }
 
     private void Start()
@@ -37,6 +42,7 @@ public class PlayerMovementManager : MonoBehaviour
     private void StartMovement()
     {
         _forwardSpeed = playerSpeed;
+        playerAnimator.SetTrigger("Run");
     }
     
     private void MovePlayer(float horizontal)
@@ -46,6 +52,18 @@ public class PlayerMovementManager : MonoBehaviour
         playerPosition.x = Mathf.Clamp(transform.position.x,-_dragLimit,_dragLimit);
         transform.position = playerPosition;
     }
+    
+    private void GameFailed()
+    {
+        playerAnimator.SetTrigger("Fail");
+    }
+    
+    private void GameWon()
+    {
+        playerAnimator.SetTrigger("Win");
+    }
+    
+    
     
     
 }

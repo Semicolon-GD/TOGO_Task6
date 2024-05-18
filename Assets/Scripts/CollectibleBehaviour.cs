@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
+
 
 public class CollectibleBehaviour : MonoBehaviour
 {
@@ -7,6 +9,8 @@ public class CollectibleBehaviour : MonoBehaviour
     private float _smoothTime=0.2f;
     private Transform _currentLeadTransform;
 
+
+ 
 
     private void OnEnable()
     {
@@ -38,12 +42,9 @@ public class CollectibleBehaviour : MonoBehaviour
             case "Collected":
                 EventManager.Trigger(EventList.OnCollectiblePickup,this.gameObject);
                 break;
-            case "Gate":
-                EventManager.Trigger(EventList.OnObstacleHit,this.gameObject);
-                break;
         }
     }
-    private void StopFollowing()
+    public void StopFollowing()
     {
         _currentLeadTransform = null;
         transform.GetComponent<BoxCollider>().isTrigger = true;

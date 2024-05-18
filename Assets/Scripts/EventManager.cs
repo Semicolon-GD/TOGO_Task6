@@ -13,7 +13,10 @@ public static class EventManager
     public static void Subscribe(EventList eventName, Action action)
     {
         if (!_eventTable.ContainsKey(eventName))
+        {
             _eventTable[eventName] = action;
+           // Debug.Log($"Event {eventName} subscribed.");
+        }
         else _eventTable[eventName] += action;
     }
     
@@ -22,13 +25,23 @@ public static class EventManager
         if (_eventTable[eventName] != null)
             _eventTable[eventName] -= action;
         if (_eventTable[eventName] == null)
+        {
             _eventTable.Remove(eventName);
+           // Debug.Log($"Event {eventName} unsubscribed and removed.");
+        }
     }
     
     public static void Trigger(EventList eventName)
     {
-        if (_eventTable[eventName] != null)
+        if (_eventTable.ContainsKey(eventName) && _eventTable[eventName] != null)
+        {
             _eventTable[eventName]?.Invoke();
+           // Debug.Log($"Event {eventName} triggered.");
+        }
+        else
+        {
+         //   Debug.LogWarning($"Event {eventName} not found in event table.");
+        }
     }
     
     #endregion
