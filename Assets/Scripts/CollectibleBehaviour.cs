@@ -5,6 +5,8 @@ using UnityEngine.Serialization;
 
 public class CollectibleBehaviour : MonoBehaviour
 {
+    [SerializeField] public Animator collectibleAnimator;
+    
     private float _currentVelocity=0f;
     private float _smoothTime=0.2f;
     private Transform _currentLeadTransform;
@@ -52,5 +54,6 @@ public class CollectibleBehaviour : MonoBehaviour
     public void SetLeadTransform(Transform leadTransform)
     {
         _currentLeadTransform = leadTransform;
+        collectibleAnimator.SetTrigger("Run");
     }
 }

@@ -55,7 +55,8 @@ public class PlayerMovementManager : MonoBehaviour
     
     private void GameFailed()
     {
-        playerAnimator.SetTrigger("Fail");
+        playerAnimator.SetTrigger("Fall");
+        _forwardSpeed = 0;
     }
     
     private void GameWon()

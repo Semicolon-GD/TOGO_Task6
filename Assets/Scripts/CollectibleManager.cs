@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,7 +36,7 @@ public class CollectibleManager : MonoBehaviour
        _stackList.Add(collectible);
        collectible.transform.SetParent(stackParent.transform, true);
        collectible.transform.localPosition = stackPoint.transform.localPosition;
-       stackPoint.transform.localPosition += Vector3.forward * 2;
+       stackPoint.transform.localPosition += Vector3.forward * 3.5f;
 
        switch (_stackList.Count)
        {
@@ -72,6 +73,8 @@ public class CollectibleManager : MonoBehaviour
        if (score>0)
        {
            EventManager.Trigger(EventList.GameWon, score);
+           EventManager.Trigger(EventList.GameWon);
+           StartCoroutine(DestroyCollectibles());
        }
        else
        {
@@ -79,5 +82,19 @@ public class CollectibleManager : MonoBehaviour
        }
          
    }
-  
+
+   private IEnumerator DestroyCollectibles()
+   {
+       
+       while (_stackList.Count>0)
+       {
+           Debug.Log("Destroying Collectibles");
+           var lostCollectible = _stackList[^1];
+           lostCollectible.GetComponent<CollectibleBehaviour>().collectibleAnimator.SetTrigger("Fall");
+           _stackList.Remove(lostCollectible);
+           yield return new WaitForSeconds(.45f);
+           Destroy(lostCollectible);
+           
+       }
+   }
 }
